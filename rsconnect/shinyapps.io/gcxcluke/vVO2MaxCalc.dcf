@@ -1,0 +1,12 @@
+name: vVO2MaxCalc
+title: vVO2MaxCalc
+username:
+account: gcxcluke
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1326431
+bundleId: 2736854
+url: https://gcxcluke.shinyapps.io/vVO2MaxCalc/
+when: 1579311033.8526
+asMultiple: FALSE
+asStatic: FALSE

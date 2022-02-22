@@ -1,0 +1,16 @@
+table {
+   max-width: 95%;
+   border: 10px solid #ccc;
+   text-align: center
+ }
+
+th {
+  background-color: #000000;
+    color: #ffffff;
+    width: 125px;
+}
+
+td {
+  background-color: #dcdcdc;
+  width: 125px;
+}

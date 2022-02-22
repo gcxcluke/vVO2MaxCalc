@@ -1,0 +1,129 @@
+---
+title: "Team Workout Paces"
+author: "Using vVO2Max"
+date: "`r Sys.time()`"
+output:
+  html_document:
+    toc: TRUE
+    css: style.css
+params:
+  file1: NA
+---
+
+
+
+```{r include=FALSE}
+require(knitr)
+require(mosaic)
+require(tigerstats)
+require(DT)
+library(xtable)
+source('C:/Users/gcxcl/Dropbox/vVO2MaxCalc/www/style.R')
+
+
+trial=params$file1
+
+min2sec=function(min,sec=0){
+    return((min*60)+sec)
+}
+
+sec2min=function(sec){
+    min=floor(sec/60)
+    sec=sec %% 60
+    return(sprintf("%02d:%02d", as.integer(min), as.integer(sec)))
+}
+```
+
+
+
+
+
+
+
+```{r echo=FALSE, results='asis'}
+
+length=length(trial[,1])
+
+for(i in trial[,1]){
+
+  equiv=data.frame(Pace = c("Aerobic", "Threshold", "", "","Lactate",
+                                "Threshold","","10K","8k", "5k", "vVO2Max/3k", "",
+                                "1500m", "","800m",""), 
+                   Percentage=c("65%", "70%", "75%","80%", "85%", "88%", "90%","92%","95%",
+                                "97%","100%","102%","110%","112%","120%", "136%"),
+                   MilePace = rep(NA,16),
+                   Equivalent = rep(NA,16)
+  )
+
+  names(equiv)=c("Pace", "Percentage", "Mile Pace", "Equivalent")
+
+  training=data.frame(Distance = c("Aerobic", "Threshold", "", "","Lactate",
+                                       "Threshold","","10K","8k", "5k", "vVO2Max/3k", "",
+                                       "1500m", "","800m",""), 
+                      Percentage=c("65%", "70%", "75%","80%", "85%", "88%", "90%","92%","95%",
+                                   "97%","100%","102%","110%","112%","120%", "136%"),
+                      a200m = rep(NA,16),
+                      a300m = rep(NA,16),
+                      a400m = rep(NA,16),
+                      a600m = rep(NA,16),
+                      a800m = rep(NA,16),
+                      a1000m = rep(NA,16),
+                      a1200m = rep(NA,16),
+                      a1600m = rep(NA,16)
+  )
+  
+  
+  
+        factor2=switch(as.character(trial[trial$Name==i,4]),
+                       "1500m" = 0.932057,
+                       "3k" = 1.86411,
+                       "2 mile" = 2,
+                       "5k" = 3.10686,
+                       "8k" = 4.97097,
+                       "10k" = 6.21371)
+        
+        factor1=switch(as.character(trial[trial$Name==i,4]),
+                       "1500m" = 1.1,
+                       "3k" = 1,
+                       "2 mile" = 1,
+                       "5k" = .97,
+                       "8k" = .95,
+                       "10k" = .92)
+  seconds=min2sec(trial[trial$Name==i,2], trial[trial$Name==i,3])
+        vvo2=(seconds/factor2)*factor1
+        
+        temp1=vvo2 / c(.65, .70, .75, .80, .85, .88, .90, .92, .95, .97, 1, 1.02, 1.1, 1.12, 1.2, 1.36)
+        temp2=c(0,0,0,0,0,0,0,6.21371,4.97097,3.10686,1.86411,1.86411,0.932057,0.932057,0.497097,0.497097)*temp1
+        
+        paces=sec2min(temp1)
+        equivs=sec2min(temp2)
+        
+        equiv[,3]=paces
+        equiv[8:16,4]=equivs[8:16]
+        
+        
+        training$a200m=sec2min(temp1*0.124274)
+        training$a300m=sec2min(temp1*0.186411)
+        training$a400m=sec2min(temp1*0.248548)
+        training$a600m=sec2min(temp1*0.372823)
+        training$a800m=sec2min(temp1*0.497097)
+        training$a1000m=sec2min(temp1*0.621371)
+        training$a1200m=sec2min(temp1*0.7456454)
+        training$a1600m=sec2min(temp1*0.9941939)
+        
+        names(training)=c("Pace","Percentages", "200m", "300m", "400m", "600m", "800m", "1000m", "1200m", "1600m")
+        
+  combinetab=data.frame(equiv,training)
+  final=combinetab[!duplicated(as.list(combinetab))]       
+  names(final)=c("Pace","Percentages","Mile Pace", "Equivalent", "200m", "300m", "400m", "600m", "800m", "1000m", "1200m", "1600m")      
+  
+  cat("###", i, "\n")
+  cat("\n")
+  cat("Your estimated vVO2Max is ", sec2min(vvo2), "per mile.")
+  cat("\n")
+  print(xtable(final), type = "html",include.rownames=FALSE)
+  cat("\n")
+  cat("\n")
+}
+```
+
